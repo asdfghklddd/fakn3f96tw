@@ -246,16 +246,21 @@ const tierCls = t => ({"第一梯队":"t1","核心主申":"t1","第二梯队":"t
 const REGION_DOT = {"Hong Kong":"#e11d48","Singapore":"#f59e0b","Australia":"#10b981","Mainland China":"#6366f1",
   "France":"#3b82f6","Sweden":"#06b6d4","Italy":"#84cc16","Denmark":"#ef4444","Finland":"#64748b","Austria":"#f97316"};
 const DATE_RE = /20\d{2}[年\/.-]\s?\d{1,2}[月\/.-]\s?\d{1,2}/g;
-function firstDate(txt){ if(!txt) return null; const parts=(txt.match(DATE_RE)||[]).map(x=>{const p=x.split(/[^0-9]/).filter(Boolean);return new Date(+p[0],+p[1]-1,+p[2]);}).filter(d=>!isNaN(d)); return parts.length?parts.sort((a,b)=>a-b)[0]:null; }
+function allDates(txt){ if(!txt) return []; return (txt.match(DATE_RE)||[]).map(x=>{const p=x.split(/[^0-9]/).filter(Boolean);return new Date(+p[0],+p[1]-1,+p[2]);}).filter(d=>!isNaN(d)); }
+function relevantDate(d){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const parts = allDates(d.deadline);
+  const future = parts.filter(p => p >= today).sort((a,b)=>a-b);
+  return future.length ? future[0] : null;
+}
 function daysBadge(d){
-  const dt = firstDate(d.deadline);
+  const dt = relevantDate(d);
   if(!dt) return "";
   const approx = /[顺延预计约待]/.test(d.deadline);
   const days = Math.ceil((dt - new Date())/864e5);
   const iso = dt.toISOString().slice(0,10);
-  const cls = days<0 ? "past" : days<=30 ? "hot" : days<=90 ? "warn" : "ok";
-  const txt = days<0 ? `已过 ${iso}` : `${days} 天 · ${iso}`;
-  return `<span class="dpill ${cls}">${approx?"≈ ":""}${txt}</span>`;
+  const cls = days<=30 ? "hot" : days<=90 ? "warn" : "ok";
+  return `<span class="dpill ${cls}">${approx?"≈ ":""}${days} 天 · ${iso}</span>`;
 }
 function tierBadge(t){ return t?`<span class="b ${tierCls(t)}">${esc(t)}</span>`:""; }
 function card(d){
@@ -275,7 +280,7 @@ function card(d){
   </div>`;
 }
 let fRegion="", fQ="", fTier="", fFit="", fSt="", sortMode="prio";
-function earliest(d){ const dt=firstDate(d.deadline); return dt?dt.getTime():Infinity; }
+function earliest(d){ const dt=relevantDate(d); return dt?dt.getTime():Infinity; }
 function render(){
   let list = DATA.filter(d=>{
     if(fRegion && d.region!==fRegion) return false;

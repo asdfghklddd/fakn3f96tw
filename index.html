@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>2027 研究生申请总览 · 64 项目</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--card:#f2f4f7;--text:#17191d;--muted:#6b7280;--border:#dfe3e8;--accent-bg:#e8edf4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 16px 60px}
+h1{margin:0;font-size:26px;letter-spacing:-.02em}
+.sub{margin-top:6px;color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0}
+.stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 14px}
+.stat .k{font-size:12px;color:var(--muted)}.stat .v{font-size:22px;font-weight:700;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:13px;background:var(--panel);cursor:pointer;user-select:none}
+.chip.on{background:var(--accent-bg);font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;margin:12px 0;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+select,input[type=search]{padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:#fff;color:var(--text);font-size:14px}
+input[type=search]{flex:1;min-width:200px}
+button{padding:8px 13px;border:1px solid var(--border);border-radius:9px;background:#fff;cursor:pointer;font-size:13px}
+button:hover{background:var(--accent-bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.school{font-weight:700;font-size:16px}
+.prog{color:var(--muted);font-size:13px;margin-top:2px}
+.prog b{color:var(--text);font-weight:600}
+.badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.b{font-size:11.5px;padding:3px 8px;border-radius:999px;border:1px solid var(--border);background:var(--card);white-space:nowrap}
+.b.t1{background:#e2f0d9}.b.t2{background:#d9ead3}.b.t3{background:#fce4d6}.b.t4{background:#f4cccc}.b.ts{background:#d9d2e9}.b.tc{background:#fff2cc}
+.b.qs{font-weight:700}
+.dl{font-size:12.5px;background:var(--card);border-radius:8px;padding:7px 9px}
+.dl .lab{color:var(--muted)}
+.days{font-weight:700;color:#b45309}
+.days.ok{color:#0f766e}.days.past{color:#9ca3af;font-weight:400}
+.act{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.act a{font-size:13px;color:#1d4ed8;text-decoration:none;border:1px solid var(--border);padding:6px 10px;border-radius:8px}
+.act a:hover{background:var(--accent-bg)}
+select.st{font-size:12.5px;padding:6px 8px}
+.st-已递交{background:#fce4d6}.st-offer{background:#d9ead3}.st-等结果{background:#d9d2e9}.st-材料准备{background:#fff2cc}.st-调研中{background:#cfe2f3}.st-放弃{color:#9ca3af}
+.more{border-top:1px dashed var(--border);padding-top:8px;font-size:12.5px;color:#374151;display:none;white-space:pre-wrap}
+.card.open .more{display:block}
+.tg{font-size:12px;color:#1d4ed8;cursor:pointer;background:none;border:none;padding:0}
+.foot{margin-top:18px;color:var(--muted);font-size:12px}
+.err{background:#fff2cc;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px}
+@media (prefers-color-scheme: dark){:root{--bg:#0f1115;--panel:#15181e;--card:#1c2027;--text:#f3f4f6;--muted:#9ca3af;--border:#2d333c;--accent-bg:#232a35}
+select,input[type=search]{background:#11151a;color:var(--text)}.b{background:#11151a}.dl{background:#1c2027}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>2027 研究生申请总览</h1>
+  <div class="sub">香港 · 新加坡 · 澳大利亚 · 中国内地（港科广/港中深） · 欧洲大陆 ｜ 数据更新：2026-08-29 ｜ 进度保存在本浏览器，可导出/导入</div>
+  <div class="stats" id="stats"></div>
+  <div class="chips" id="regionChips"></div>
+  <div class="panel">
+    <input type="search" id="q" placeholder="搜索学校 / 项目 / 主题…"/>
+    <select id="fTier"><option value="">全部定位</option></select>
+    <select id="fFit"><option value="">全部匹配</option></select>
+    <select id="fSt"><option value="">全部状态</option></select>
+    <select id="sort"><option value="prio">按优先级</option><option value="days">按最近截止</option></select>
+    <button id="exp">导出进度</button>
+    <button id="imp">导入进度</button>
+    <input type="file" id="impFile" accept=".json" style="display:none"/>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="foot" id="foot"></div>
+</main>
+<script>
+const STS = ["未开始","调研中","材料准备","已递交","等结果","offer","放弃"];
+const KEY = "grad2027_status_v1";
+let DATA = [];
+let store = {};
+try{ store = JSON.parse(localStorage.getItem(KEY) || "{}"); }catch(e){}
+const save = () => localStorage.setItem(KEY, JSON.stringify(store));
+const esc = s => (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const tierCls = t => ({"第一梯队":"t1","核心主申":"t1","第二梯队":"t2","主申偏冲":"t2","第三梯队":"t3","冲刺":"t3","第四梯队":"t4","副线主申":"t4","副线冲刺":"t4","条件型":"tc","研究特别项":"ts","重点关注":"ts"})[t]||"";
+const DATE_RE = /20\d{2}[年\/.-]\s?\d{1,2}[月\/.-]\s?\d{1,2}/g;
+function firstDate(txt){ if(!txt) return null; const parts=(txt.match(DATE_RE)||[]).map(x=>{const p=x.split(/[^0-9]/).filter(Boolean);return new Date(+p[0],+p[1]-1,+p[2]);}).filter(d=>!isNaN(d)); return parts.length?parts.sort((a,b)=>a-b)[0]:null; }
+function daysBadge(d){
+  const dt = firstDate(d.deadline);
+  if(!dt) return "";
+  const approx = /[顺延预计约待]/.test(d.deadline);
+  const days = Math.ceil((dt - new Date())/864e5);
+  const iso = dt.toISOString().slice(0,10);
+  const cls = days<0 ? "past" : days<=60 ? "" : "ok";
+  const txt = days<0 ? `已过 ${iso}` : `${days} 天（${iso}）`;
+  return `<span class="days ${cls}">${approx?"≈ ":""}最早节点 ${txt}</span>`;
+}
+function tierBadge(t){ return t?`<span class="b ${tierCls(t)}">${esc(t)}</span>`:""; }
+function card(d){
+  const st = store[d.id]||"未开始";
+  const opts = STS.map(x=>`<option ${x===st?"selected":""}>${x}</option>`).join("");
+  const link = d.link?`<a href="${d.link}" target="_blank" rel="noopener">官网 ↗</a>`:"";
+  return `<div class="card" data-id="${d.id}">
+    <div class="school">${esc(d.school)} <span class="b qs">#${d.qs||"-"}</span></div>
+    <div class="prog"><b>${esc(d.prog)}</b> ${esc(d.prog_en)}</div>
+    <div class="badges">${tierBadge(d.tier)}<span class="b">${esc(d.fit)}</span><span class="b">${esc(d.region)}</span>${d.fee?`<span class="b">💰 ${esc(d.fee)}</span>`:""}${d.dur?`<span class="b">⏱ ${esc(d.dur)}</span>`:""}</div>
+    <div class="dl"><span class="lab">开放：</span>${esc(d.open)||"-"}<br/><span class="lab">截止：</span>${esc(d.deadline)||"-"}<br/>${daysBadge(d)}</div>
+    <div class="act"><select class="st st-${st}">${opts}</select>${link}<button class="tg">详情 ▾</button><span class="b">P${d.prio}</span></div>
+    <div class="more">${[d.themes&&"【主题】"+d.themes,d.req&&"【要求/风险】"+d.req,d.fit_note&&"【适配】"+d.fit_note,d.timeline&&"【时间线】"+d.timeline,d.notes&&"【备注】"+d.notes].filter(Boolean).map(esc).join("\n\n")}</div>
+  </div>`;
+}
+let fRegion="", fQ="", fTier="", fFit="", fSt="", sortMode="prio";
+function earliest(d){ const dt=firstDate(d.deadline); return dt?dt.getTime():Infinity; }
+function render(){
+  let list = DATA.filter(d=>{
+    if(fRegion && d.region!==fRegion) return false;
+    if(fTier && d.tier!==fTier) return false;
+    if(fFit && d.fit!==fFit) return false;
+    if(fSt && (store[d.id]||"未开始")!==fSt) return false;
+    if(fQ){ const hay=(d.school+d.prog+d.prog_en+d.themes+d.tier+d.fit).toLowerCase(); if(!hay.includes(fQ.toLowerCase())) return false; }
+    return true;
+  });
+  list.sort(sortMode==="days" ? (a,b)=>earliest(a)-earliest(b) : (a,b)=>a.prio-b.prio);
+  document.getElementById("grid").innerHTML = list.map(card).join("") || "<p>没有匹配的项目。</p>";
+  const cnt = {}; STS.forEach(s=>cnt[s]=0);
+  DATA.forEach(d=>cnt[store[d.id]||"未开始"]++);
+  const done = cnt["已递交"]+cnt["等结果"]+cnt["offer"];
+  document.getElementById("stats").innerHTML =
+    `<div class="stat"><div class="k">项目总数</div><div class="v">${DATA.length}</div></div>` +
+    STS.slice(1).map(s=>`<div class="stat"><div class="k">${s}</div><div class="v">${cnt[s]}</div></div>`).join("") +
+    `<div class="stat"><div class="k">已推进（递交后）</div><div class="v">${done}</div></div>`;
+  document.getElementById("foot").textContent = "状态保存在当前浏览器 localStorage；换设备请用「导出进度/导入进度」。数据源：2027申请项目总表.xlsx（64 项，2026-08-29）";
+}
+function initFilters(){
+  const REGIONS = [...new Set(DATA.map(d=>d.region))];
+  document.getElementById("regionChips").innerHTML =
+    `<span class="chip on" data-r="">全部地区</span>` + REGIONS.map(r=>`<span class="chip" data-r="${r}">${r}</span>`).join("");
+  document.getElementById("regionChips").addEventListener("click", e=>{
+    const c = e.target.closest(".chip"); if(!c) return;
+    document.querySelectorAll("#regionChips .chip").forEach(x=>x.classList.remove("on"));
+    c.classList.add("on"); fRegion = c.dataset.r; render();
+  });
+  [["fTier","tier"],["fFit","fit"],["fSt",null]].forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    const vals = key ? [...new Set(DATA.map(d=>d[key]))] : STS.slice(1);
+    vals.forEach(v=>{const o=document.createElement("option");o.textContent=v;el.appendChild(o);});
+  });
+  document.getElementById("fTier").onchange = e=>{fTier=e.target.value;render();};
+  document.getElementById("fFit").onchange = e=>{fFit=e.target.value;render();};
+  document.getElementById("fSt").onchange = e=>{fSt=e.target.value;render();};
+  document.getElementById("q").oninput = e=>{fQ=e.target.value.trim();render();};
+  document.getElementById("sort").onchange = e=>{sortMode=e.target.value;render();};
+  document.getElementById("grid").addEventListener("change", e=>{
+    if(!e.target.classList.contains("st")) return;
+    const cardEl = e.target.closest(".card"); const id = cardEl.dataset.id;
+    store[id] = e.target.value; save();
+    cardEl.querySelectorAll("select.st").forEach(s=>s.className="st st-"+e.target.value);
+    render();
+  });
+  document.getElementById("grid").addEventListener("click", e=>{
+    if(e.target.classList.contains("tg")) e.target.closest(".card").classList.toggle("open");
+  });
+  document.getElementById("exp").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(store,null,1)],{type:"application/json"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="grad2027-progress.json"; a.click();
+  };
+  document.getElementById("imp").onclick = ()=>document.getElementById("impFile").click();
+  document.getElementById("impFile").onchange = e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const rd = new FileReader();
+    rd.onload = ()=>{ try{ store = JSON.parse(rd.result); save(); render(); alert("导入成功"); }catch(x){ alert("文件格式不对"); } };
+    rd.readAsText(f);
+  };
+}
+fetch("./data.json").then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(d=>{ DATA = d; initFilters(); render(); })
+  .catch(err=>{
+    document.getElementById("grid").innerHTML =
+      `<div class="err">数据加载失败：${esc(err.message)}。请确认 data.json 与页面在同一目录（GitHub Pages 环境下正常）。</div>`;
+  });
+</script>
+</body>
+</html>

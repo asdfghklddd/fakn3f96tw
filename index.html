@@ -47,7 +47,7 @@ body{margin:0;background:var(--bg);color:var(--text);
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
 /* ---------- header ---------- */
-#app.hidden{display:none}
+.hidden{display:none!important}
 .top{position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:12px;
   padding:10px 20px;border-bottom:1px solid var(--border);
   background:rgba(244,245,251,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
@@ -365,7 +365,7 @@ async function tryUnlock(){
   try{
     DATA = await decryptVault(pw);
   }catch(e){
-    err.textContent = "密码错误，请重试";
+    err.textContent = "密码错误，请重试 [" + (e && e.name ? e.name : "?") + ": " + (e && e.message ? e.message : "?") + "]";
     box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
     return;
   }

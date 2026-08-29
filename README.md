@@ -1,9 +1,7 @@
-# 2027 研究生申请总览（64 项目）
+# private dashboard
 
-数据源：本地工作区 研究生项目/2027申请项目总表.xlsx（香港 16 · 新加坡 13 · 澳大利亚 14 · 中国内地 7 · 欧洲大陆 14）。
+Encrypted single-page app. Access requires the passphrase (not stored in this repo).
 
-- 在线页面：https://asdfghklddd.github.io/grad-application-tracker-2027/
-- 申请进度（状态标记）保存在浏览器 localStorage，可通过页面上的「导出进度 / 导入进度」跨设备迁移。
-- 更新数据：修改本地 xlsx 后重新生成 data.json 并推送本仓库。
-
-生成时间：2026-08-29
+- URL: https://asdfghklddd.github.io/fakn3f96tw/
+- Data: AES-256-GCM ciphertext embedded in index.html; key derived from the passphrase via PBKDF2-SHA256 (150k).
+- noindex/nofollow; robots.txt disallow all.

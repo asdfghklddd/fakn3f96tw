@@ -348,7 +348,7 @@ function initFilters(){
 }
 const b64ToBuf = s64 => Uint8Array.from(atob(s64), c => c.charCodeAt(0));
 async function decryptVault(pass){
-  const raw = JSON.parse(VAULT);
+  const raw = typeof VAULT === "string" ? JSON.parse(VAULT) : VAULT;
   const keyMat = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
   const key = await crypto.subtle.deriveKey(
     { name:"PBKDF2", salt: b64ToBuf(raw.s), iterations: raw.it, hash:"SHA-256" },

@@ -352,6 +352,8 @@ function render(){
   document.getElementById("tier3Chips").innerHTML =
     `<span class="chip ${fT3===""?"on":""}" data-t="">全部匹配</span>` +
     [1,2,3].map(k=>`<span class="chip ${String(k)===fT3?"on":""}" data-t="${k}">${T3LAB[k]} <b>${t3c[k]||0}</b></span>`).join("");
+  document.getElementById("tlCntA").textContent = DATA.filter(d=>(d.batch||"").startsWith("主")).length;
+  document.getElementById("tlCntB").textContent = DATA.filter(d=>(d.batch||"").startsWith("保")).length;
   document.getElementById("pgDone").textContent = `已推进 ${cnt["已递交"]+cnt["等结果"]+cnt["offer"]} / ${DATA.length}`;
   document.getElementById("foot").textContent = "🔒 数据已加密 · 进度状态保存在当前浏览器，跨设备请用「导出 / 导入进度」 · 数据源：2027申请项目总表（" + DATA.length + " 项，2026-08-30）";
 }

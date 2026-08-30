@@ -258,7 +258,7 @@ function daysBadge(d){
   if(!dt) return "";
   const approx = /[顺延预计约待]/.test(d.deadline);
   const days = Math.ceil((dt - new Date())/864e5);
-  const iso = dt.toISOString().slice(0,10);
+  const iso = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
   const cls = days<=30 ? "hot" : days<=90 ? "warn" : "ok";
   return `<span class="dpill ${cls}">${approx?"≈ ":""}${days} 天 · ${iso}</span>`;
 }

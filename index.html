@@ -347,11 +347,6 @@ function render(){
     [1,2,3].map(k=>`<span class="chip ${String(k)===fT3?"on":""}" data-t="${k}">${T3LAB[k]} <b>${t3c[k]||0}</b></span>`).join("");
   document.getElementById("tlCntA").textContent = DATA.filter(d=>(d.batch||"").startsWith("主")).length;
   document.getElementById("tlCntB").textContent = DATA.filter(d=>(d.batch||"").startsWith("保")).length;
-  const bc = {};
-  DATA.forEach(d=>{const b=(d.batch||"未设批次"); bc[b]=(bc[b]||0)+1;});
-  document.getElementById("batchChips").innerHTML =
-    `<span class="chip ${fBatch===""?"on":""}" data-b="">全部批次</span>` +
-    Object.keys(bc).map(b=>`<span class="chip ${fBatch===b?"on":""}" data-b="${b}">${b} <b>${bc[b]}</b></span>`).join("");
   document.getElementById("tlCntA").textContent = DATA.filter(d=>(d.batch||"").startsWith("主")).length;
   document.getElementById("tlCntB").textContent = DATA.filter(d=>(d.batch||"").startsWith("保")).length;
   const done = cnt["已递交"]+cnt["等结果"]+cnt["offer"];

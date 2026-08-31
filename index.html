@@ -79,16 +79,16 @@ html[data-theme="dark"]{color-scheme:dark;--paper:#171c24;--surface:#202631;--so
     <button class="plain progress-toggle" id="overviewToggle" aria-expanded="false" aria-controls="overviewMore">进度明细 <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
   </div><div class="overview-more" id="overviewMore" hidden><div class="overview-columns">
     <div><div class="section-caption"><span>点击状态，筛选项目</span><span id="pgDone"></span></div><div class="sgbar" id="sgbar" aria-hidden="true"></div><div class="schips" id="schips" role="group" aria-label="按申请进度筛选"></div></div>
-    <div><div class="section-caption"><span>入学计划</span><span>以各项目官方日期为准</span></div><div class="timeline" id="timeline"></div><p class="overview-note">批次数量随当前项目更新；具体申请轮次与推算说明保留在项目内。</p></div>
+    <div><div class="section-caption"><span>申请批次</span><span>以各项目官方日期为准</span></div><div class="timeline" id="timeline"></div><p class="overview-note">批次数量随当前项目更新；申请开始与截止原文保留在项目内。</p></div>
   </div></div></section>
   <section class="timeline-panel" id="projectTimeline" aria-labelledby="timelineTitle">
     <header class="global-heading"><div><div class="eyebrow">ONE TIMELINE / ALL UNIVERSITIES</div><h2 id="timelineTitle">申请时间轴</h2><p>所有学校汇集在同一根线上。移动鼠标放大一段时间，查看这一区域的全部学校与申请节点。</p></div><span id="globalTotal" class="global-total"></span></header>
     <div class="global-controls"><div class="global-batches" role="group" aria-label="时间轴申请批次"><button data-global-batch="" aria-pressed="true">全部学校</button><button data-global-batch="主申请" aria-pressed="false">主申请 2027 <span id="timelineMainCount"></span></button><button data-global-batch="保底" aria-pressed="false">保底 2028 <span id="timelineFallbackCount"></span></button></div><label class="global-span" for="globalSpan">放大范围<select id="globalSpan"><option value="30">附近 30 天</option><option value="60" selected>附近 60 天</option><option value="120">附近 120 天</option></select></label></div>
     <div class="global-stage"><p class="global-idle" id="globalIdle">把鼠标移到时间线上试试 <span>手机点按 · 键盘方向键移动 · 回车固定</span></p><div class="global-rail" id="globalRail" tabindex="0" role="slider" aria-label="全局申请时间轴，方向键移动七天，回车固定区域" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-describedby="globalHint"><span class="global-baseline" aria-hidden="true"></span><span class="global-brush" id="globalBrush" hidden aria-hidden="true"></span><div id="globalMarks"></div><div id="globalScale" aria-hidden="true"></div><div class="global-magnifier" id="globalMagnifier" hidden aria-hidden="true"></div></div></div>
-    <div class="global-caption"><p id="globalCount" role="status"></p><span><i class="global-key"></i>原文日期 <i class="global-key estimated"></i>预计 / 月份范围</span></div>
+    <div class="global-caption"><p id="globalCount" role="status"></p><span><i class="global-key"></i>申请原文日期 <i class="global-key estimated"></i>预计 / 月份范围</span></div>
     <section class="global-detail" id="globalDetail" aria-labelledby="globalDetailTitle" hidden><header class="global-detail-head"><div><div class="eyebrow">MAGNIFIED REGION <span id="globalZoom"></span></div><h3 id="globalDetailTitle"></h3><p id="globalDetailCount"></p></div><div><button class="btn" id="globalPin" aria-pressed="false">固定区域</button><button class="plain" id="globalClose" aria-label="收起时间区域详情">收起 ×</button></div></header><div class="global-events" id="globalEvents"></div></section>
     <details class="global-undated"><summary id="globalUndatedSummary">尚无本季日期的项目</summary><div id="globalUndated"></div></details>
-    <p class="global-footnote" id="globalHint">范围从 2026-07-01 开始。相同日期的刻度合并显示数量，放大后逐项展开；历史轮次不顺延，月份范围不补造具体日。</p>
+    <p class="global-footnote" id="globalHint">范围从 2026-07-01 开始，只显示申请开始与申请截止。相同日期的刻度合并显示数量，放大后逐项展开；历史轮次不顺延，月份范围不补造具体日。</p>
   </section>
   <div class="workspace">
     <aside class="sidebar" id="filters" aria-labelledby="filterTitle">
@@ -354,7 +354,7 @@ function projectTimelineModel(program){
 }
 function timelineDomain(models){
   const seasonStart=+new Date(2026,6,1), seasonFloor=+new Date(2028,2,1);
-  const events=models.flatMap(m=>m.events);
+  const events=models.flatMap(m=>m.events).filter(event=>event.kind==="open"||event.kind==="deadline");
   if(!events.length)return {min:seasonStart,max:seasonFloor};
   const last=new Date(Math.max(...events.map(e=>e.end)));
   return {min:seasonStart,max:Math.max(seasonFloor,+new Date(last.getFullYear(),last.getMonth()+1,1))};
@@ -364,13 +364,13 @@ function timelineWindow(center,days,domain){
   const min=Math.max(domain.min,Math.min(center-width/2,domain.max-width));
   return {min,max:min+width};
 }
-const TL_KIND={open:"开放",deadline:"截止 / 轮次",intake:"入学 / 开学",note:"说明日期"};
-const TL_SOURCE={open:"开放栏原文",deadline:"截止栏原文",timeline:"时间说明原文"};
+const TL_KIND={open:"申请开始",deadline:"申请截止 / 轮次"};
+const TL_SOURCE={open:"申请开始原文",deadline:"申请截止原文"};
 const tlDate=value=>{const d=new Date(value);return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")}`;};
 const tlPercent=(value,domain)=>Math.max(0,Math.min(100,(value-domain.min)/(domain.max-domain.min)*100));
 const globalTimeline={models:[],domain:null,entries:[],visible:[],buckets:[],center:0,days:60,batch:"",pinned:false,active:false,frame:null,detailKey:null};
 function globalTimelineEntries(models,domain,batch=""){
-  return models.filter(m=>!batch||(m.program.batch||"").includes(batch)).flatMap(model=>model.events.filter(event=>event.end>=domain.min&&event.start<domain.max).map(event=>({key:`${model.program.id}/${event.index}`,program:model.program,event}))).sort((a,b)=>a.event.start-b.event.start||a.program.prio-b.program.prio);
+  return models.filter(m=>!batch||(m.program.batch||"").includes(batch)).flatMap(model=>model.events.filter(event=>(event.kind==="open"||event.kind==="deadline")&&event.end>=domain.min&&event.start<domain.max).map(event=>({key:`${model.program.id}/${event.index}`,program:model.program,event}))).sort((a,b)=>a.event.start-b.event.start||a.program.prio-b.program.prio);
 }
 function bucketTimelineEvents(entries){
   const dates=new Map();
@@ -386,7 +386,7 @@ function globalCalendarTicks(domain){
 }
 function globalNodeCard(entry){
   const d=entry.program,e=entry.event,link=safeLink(d.link);
-  return `<article class="global-event-card" data-global-entry="${esc(entry.key)}"><div class="global-event-date"><strong>${esc(e.label)}</strong><span>${TL_KIND[e.kind]}</span></div><h4>${esc(d.school)}</h4><p class="global-program">${esc(d.prog)}</p><div class="global-event-flags"><span>${esc(d.batch||"批次待定")}</span>${e.estimated?'<span class="caution">预计 / 推算</span>':""}${e.precision==="period"?'<span class="caution">月份范围 · 非精确日</span>':""}${e.historical?'<span>本季已过日期</span>':""}</div><details><summary>日期原文与轮次</summary>${e.sources.map(source=>`<p>${TL_SOURCE[source.field]}${source.inherited?"（年份承接同段）":""}<br>${esc(source.text)}</p>`).join("")}${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">核对项目官网 ↗</a>`:""}</details></article>`;
+  return `<article class="global-event-card" data-global-entry="${esc(entry.key)}"><div class="global-event-date"><strong>${esc(e.label)}</strong><span>${TL_KIND[e.kind]}</span></div><h4>${esc(d.school)}</h4><p class="global-program">${esc(d.prog)}</p><div class="global-event-flags"><span>${esc(d.batch||"批次待定")}</span>${e.estimated?'<span class="caution">预计 / 推算</span>':""}${e.precision==="period"?'<span class="caution">月份范围 · 非精确日</span>':""}${e.historical?'<span>本季已过日期</span>':""}</div><details><summary>申请日期原文与轮次</summary>${e.sources.filter(source=>source.field==="open"||source.field==="deadline").map(source=>`<p>${TL_SOURCE[source.field]}${source.inherited?"（年份承接同段）":""}<br>${esc(source.text)}</p>`).join("")}${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">核对项目官网 ↗</a>`:""}</details></article>`;
 }
 function renderGlobalTimeline(){
   const s=globalTimeline;s.visible=globalTimelineEntries(s.models,s.domain,s.batch);s.buckets=bucketTimelineEvents(s.visible);
@@ -400,10 +400,10 @@ function renderGlobalTimeline(){
   }).join("");
   $("globalScale").innerHTML=globalCalendarTicks(s.domain).map(time=>`<span class="global-quarter" style="--mark-x:${tlPercent(time,s.domain)}%">${tlDate(time).slice(0,7)}</span>`).join("");
   $("globalTotal").textContent=`${new Set(models.map(m=>m.program.school)).size} 所学校 · ${models.length} 个项目`;
-  $("globalCount").textContent=`${s.visible.length} 个本季节点 · ${s.buckets.length} 个日期刻度`;
+  $("globalCount").textContent=`${s.visible.length} 个本季申请节点 · ${s.buckets.length} 个日期刻度`;
   const onAxis=new Set(s.visible.map(entry=>entry.program.id));
   const unavailable=models.filter(model=>!onAxis.has(model.program.id));
-  $("globalUndatedSummary").textContent=`${unavailable.length} 个项目暂无可定位的本季日期 · 展开查看`;
+  $("globalUndatedSummary").textContent=`${unavailable.length} 个项目暂无可定位的本季申请开始/截止时间 · 展开查看`;
   $("globalUndated").innerHTML=`<div class="global-undated-list">${unavailable.map(({program:d,events})=>`<div class="global-undated-item"><strong>${esc(d.school)} · ${esc(d.prog)}</strong><p>${events.length?"仅有申请季之前的历史轮次，未自动顺延。":"原表未提供可定位日期。"}</p><p>开放原文：${esc(d.open||"未提供")}<br>截止原文：${esc(d.deadline||"未提供")}</p></div>`).join("")||"当前筛选下全部项目均有本季日期。"}</div>`;
   document.querySelectorAll("[data-global-batch]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.globalBatch===s.batch)));
   s.detailKey=null;
@@ -425,10 +425,10 @@ function showGlobalRegion(center){
   // Only the local region is expanded; entries from different schools remain distinct below.
   $("globalMagnifier").innerHTML=`<svg viewBox="0 0 224 224" xmlns="http://www.w3.org/2000/svg"><text x="112" y="36" text-anchor="middle" fill="var(--blue)" font-size="13">${tlDate(s.center)}</text><text x="112" y="58" text-anchor="middle" fill="var(--muted)" font-size="10">${schoolCount} 所学校 · ${nearby.length} 个节点</text><line x1="16" x2="208" y1="113" y2="113" stroke="var(--line-strong)"/>${buckets.map(bucket=>{const x=18+tlPercent(bucket.time,window)*1.88,estimated=bucket.entries.some(entry=>entry.event.precision==="period"||entry.event.estimated),height=Math.min(42,20+bucket.entries.length*5);return `<line x1="${x}" x2="${x}" y1="${113-height/2}" y2="${113+height/2}" stroke="${bucket.entries.every(entry=>(entry.program.batch||"").includes("保底"))?"var(--warm)":"var(--blue)"}" stroke-width="3" ${estimated?'stroke-dasharray="3 2"':""}/>${bucket.entries.length>1?`<text x="${x}" y="${105-height/2}" text-anchor="middle" font-size="10" fill="var(--blue)">${bucket.entries.length}</text>`:""}`;}).join("")}<text x="112" y="151" text-anchor="middle" font-size="10" fill="var(--muted)">${nearby.length?esc(shortSchools[0]||""):"附近没有节点"}</text><text x="112" y="169" text-anchor="middle" font-size="10" fill="var(--muted)">${esc(shortSchools[1]||"")}${schoolCount>2?` 等 ${schoolCount} 校`:""}</text><text x="112" y="195" text-anchor="middle" font-size="10" fill="var(--blue)">${tlDate(window.min).slice(5)} — ${tlDate(window.max).slice(5)}</text></svg>`;
   $("globalDetailTitle").textContent=`${tlDate(window.min)} — ${tlDate(window.max)}`;
-  $("globalDetailCount").textContent=`这段时间涉及 ${schoolCount} 所学校、${projectCount} 个项目、${nearby.length} 个节点`;
+  $("globalDetailCount").textContent=`这段时间涉及 ${schoolCount} 所学校、${projectCount} 个项目、${nearby.length} 个申请节点`;
   $("globalZoom").textContent=`×${((s.domain.max-s.domain.min)/(window.max-window.min)).toFixed(1)}`;
   const key=nearby.map(entry=>entry.key).join("|");
-  if(s.detailKey!==key){$("globalEvents").innerHTML=nearby.map(globalNodeCard).join("")||'<p class="global-empty">这段时间没有已知申请节点，沿时间轴移动查看相邻月份。</p>';s.detailKey=key;}
+  if(s.detailKey!==key){$("globalEvents").innerHTML=nearby.map(globalNodeCard).join("")||'<p class="global-empty">这段时间没有已知申请开始或截止节点，沿时间轴移动查看相邻月份。</p>';s.detailKey=key;}
   updateGlobalSlider();
 }
 function pinGlobalRegion(value){
